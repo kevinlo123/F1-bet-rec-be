@@ -1,7 +1,8 @@
 class AuthenticationController < ApplicationController
   def create
-    user = User.find_by(email: params[:email])
-    if user && user.authenticate(params[:password])
+    email = params[:user][:email]
+    user = User.find_by(email: email)
+    if user && user.authenticate(params[:user][:password])
       render json: { token: generate_token(user.id) }
     else
       render json: { error: 'Invalid email or password' }, status: :unauthorized
@@ -11,7 +12,7 @@ class AuthenticationController < ApplicationController
   private
 
   def generate_token(user_id)
-    JWT.encode({ user_id: user_id }, Rails.application.secrets.secret_key_base)
+    JWT.encode({ user_id: user_id }, Rails.application.credentials.secret_key_base)
   end
 end
 
